@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- (c) 2026 David Vallejo. All rights reserved. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UFO Hunters Medellín</title>
+<meta name="description" content="Fly a UFO over a 3D Medellín built from real map and elevation data. Grab energy cells, dodge helicopters, cloak and warp. A browser game by David Vallejo.">
+<link rel="canonical" href="https://david-vallejo.github.io/ufo-hunters-medellin/">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="UFO Hunters Medellín">
+<meta property="og:description" content="Fly a UFO over a 3D Medellín. Grab energy cells, dodge helicopters, cloak and warp.">
+<meta property="og:url" content="https://david-vallejo.github.io/ufo-hunters-medellin/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rubik:wght@400;500;700&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000;
+    --panel-edge: rgba(255, 255, 255, .08);
+    --ink: #fff7fb;
+    --muted: #c9bcd6;
+    --teal: #35e0d0;
+    --pink: #ff4fa3;
+    --orange: #ffb347;
+    --display: "Bebas Neue", "Arial Narrow", sans-serif;
+    --body: "Rubik", system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: var(--body);
+    background: linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255, 255, 255, 0.40) 0%, rgba(0, 0, 0, 0.25) 200%);
+    background-image: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%);
+    background-blend-mode: multiply;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 100px 16px 40px;
+  }
+  header { position: relative; text-align: center; margin-bottom: 22px; }
+  .logo {
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .is-playing .logo { opacity: 1; transform: none; }
+  .logo__title {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 56px;
+    line-height: .9;
+    letter-spacing: .03em;
+    background: linear-gradient(180deg, #fff3a8 8%, var(--orange) 38%, var(--pink) 70%, #8a3cff);
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)) drop-shadow(0 0 14px rgba(255, 79, 163, .45));
+  }
+  .logo__city {
+    margin: -.3em 0 0;
+    font-family: "Yellowtail", cursive;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--ink);
+    transform: rotate(-5deg);
+    text-shadow: 0 0 12px var(--teal), 0 2px 0 rgba(0, 0, 0, .45);
+  }
+  .logo__by {
+    margin: 8px 0 0;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #3480bc;
+  }
+  .game {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--panel-edge);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 79, 163, .15);
+    aspect-ratio: 16 / 9;
+    min-height: 560px;
+    max-height: max(82vh, 560px);
+    width: 100%;
+    background: #000;
+  }
+  .game iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .below {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    color: #337db7;
+    font-size: .92rem;
+  }
+  .btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--pink), var(--orange));
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  @media (max-width: 1100px) {
+    .logo { position: static; display: none; margin: 0 auto 10px; transform: none; }
+    .is-playing .logo { display: block; }
+  }
+  @media (max-width: 560px) {
+    .game { aspect-ratio: 3 / 4; max-height: 78vh; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <p class="logo__title">UFO Hunters</p>
+        <p class="logo__city">Medellín</p>
+        <p class="logo__by">Made with 💛 by David Vallejo 👨🏽‍🚀</p>
+      </div>
+    </header>
+    <div class="game">
+      <iframe src="play/?v=202610152134" title="UFO Hunters: Medellín game" allow="fullscreen; autoplay" loading="eager"></iframe>
+    </div>
+    <div class="below">
+      <span>Map data &copy; OpenStreetMap contributors, elevation from Mapzen terrain tiles.</span>
+      <a class="btn" href="play/">Play full screen</a>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var frame = document.querySelector('.game iframe');
+      var page = document.documentElement;
+      function watch() {
+        try {
+          var inner = frame.contentDocument.documentElement;
+          var sync = function () { page.classList.toggle('is-playing', inner.classList.contains('is-playing')); };
+          new MutationObserver(sync).observe(inner, { attributes: true, attributeFilter: ['class'] });
+          sync();
+        } catch (e) {}
+      }
+      frame.addEventListener('load', watch);
+      if (frame.contentDocument && frame.contentDocument.readyState === 'complete') watch();
+    })();
+  </script>
+</body>
+</html>

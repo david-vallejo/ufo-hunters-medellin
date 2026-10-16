@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- (c) 2026 David Vallejo. All rights reserved. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="description" content="Fly a UFO over a 3D Medell&iacute;n built from real map and elevation data. Grab energy cells, dodge helicopters, cloak and warp. Free browser game by David Vallejo.">
+<title>UFO Hunters — Medellín | A 3D browser game by David Vallejo</title>
+<link rel="canonical" href="https://david-vallejo.github.io/ufo-hunters-medellin/play/">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#16171b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="David Vallejo">
+<meta property="og:title" content="UFO Hunters — Medellín | A 3D browser game by David Vallejo">
+<meta property="og:description" content="Fly a UFO over a 3D Medell&iacute;n built from real map and elevation data. Grab energy cells, dodge helicopters, cloak and warp. Free browser game by David Vallejo.">
+<meta property="og:url" content="https://david-vallejo.github.io/ufo-hunters-medellin/play/">
+<meta property="og:image" content="https://davidvallejo.co/assets/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="DV logo — David Vallejo, Web Developer &amp; Designer">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rubik:wght@400;500;700&family=Yellowtail&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=202610152134">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <canvas class="stage" aria-label="UFO flying over Medellín"></canvas>
+  <div class="hud hud--hidden" aria-hidden="true">
+    <div class="hud__esc"><span class="key">Esc</span> to leave</div>
+    <div class="hud__top">
+      <div class="hud__stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+      <div class="hud__score">000000</div>
+      <div class="hud__time">2:00</div>
+    </div>
+    <div class="hud__radar">
+      <canvas class="hud__map" width="340" height="340"></canvas>
+      <div class="hud__bars">
+        <span class="bar bar--hull"><b></b></span>
+        <span class="bar bar--cloak"><b></b></span>
+      </div>
+    </div>
+    <div class="hud__place"></div>
+    <div class="hud__toast"></div>
+    <div class="hud__cloaked">Cloaked</div>
+    <div class="hud__aim"></div>
+    <div class="hud__hit"></div>
+    <div class="touch">
+      <div class="touch__stick"><span></span></div>
+      <div class="touch__buttons">
+        <button type="button" data-act="up">▲</button>
+        <button type="button" data-act="down">▼</button>
+        <button type="button" data-act="warp">Warp</button>
+        <button type="button" data-act="cloak">Cloak</button>
+        <button type="button" data-act="lock" class="touch__lock">Lock on</button>
+        <button type="button" data-act="fire" class="touch__fire">Fire</button>
+      </div>
+    </div>
+  </div>
+  <div class="radio" aria-live="polite">
+    <div class="radio__screen"><div id="radio-player"></div></div>
+    <div class="radio__info">
+      <span class="radio__label">Radio Medellín</span>
+      <span class="radio__title"></span>
+      <span class="radio__artist"></span>
+      <span class="radio__keys"><span class="key">R</span> on/off <span class="key">N</span> next</span>
+    </div>
+  </div>
+  <div class="banner banner--hidden" aria-live="polite"><span class="banner__text"></span><small class="banner__sub"></small></div>
+  <div class="dialogue">
+    <div class="dialogue__content">
+      <h1 class="dialogue__title">UFO Hunters</h1>
+      <p class="dialogue__city">Medellín</p>
+      <p class="dialogue__by">Made with 💛 by David Vallejo 👨🏽‍🚀</p>
+      <dl class="dialogue__rules controls" aria-label="Controls">
+        <div><dt>Fly</dt><dd><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dd></div>
+        <div><dt>Turn</dt><dd><kbd>&larr;</kbd><kbd>&rarr;</kbd><span>or</span><kbd>Mouse</kbd></dd></div>
+        <div><dt>Up / down</dt><dd><kbd>&uarr;</kbd><kbd>&darr;</kbd><span>or</span><kbd>Space</kbd><kbd>Shift</kbd></dd></div>
+        <div><dt>Fire</dt><dd><kbd>Mouse click</kbd><span>or</span><kbd>F</kbd></dd></div>
+        <div><dt>Cloak</dt><dd><kbd>C</kbd></dd></div>
+        <div><dt>Warp</dt><dd><kbd>E</kbd></dd></div>
+        <div><dt>Lock on</dt><dd><kbd>Q</kbd></dd></div>
+        <div><dt>Radio</dt><dd><kbd>R</kbd><span>next</span><kbd>N</kbd></dd></div>
+        <div><dt>Sound</dt><dd><kbd>M</kbd></dd></div>
+      </dl>
+      <p class="dialogue__goal">Grab the energy cells over the city. The helicopters are hunting you &mdash; shoot them down or cloak and vanish. Two minutes on the clock.</p>
+      <p class="dialogue__scores"></p>
+      <div class="hangar">
+        <div class="hangar__row"><span class="hangar__label">Ship</span><div class="hangar__options" data-pack="ships"></div></div>
+        <div class="hangar__row"><span class="hangar__label">Laser</span><div class="hangar__options" data-pack="lasers"></div></div>
+        <p class="hangar__note"></p>
+      </div>
+      <button type="button" class="dialogue__start" disabled>Loading Medellín…</button>
+      <p class="dialogue__credit">Built from the real city: map data &copy; OpenStreetMap contributors, elevation from Mapzen terrain tiles.</p>
+    </div>
+  </div>
+  <script src="store.js?v=202610152134"></script>
+  <script src="audio.js?v=202610152134"></script>
+  <script src="medellin-data.js?v=202610152134"></script>
+  <script src="game.js?v=202610152134"></script>
+</body>
+</html>
